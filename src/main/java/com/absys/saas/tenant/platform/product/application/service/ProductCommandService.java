@@ -5,6 +5,7 @@ import com.absys.saas.tenant.platform.product.application.command.*;
 import com.absys.saas.tenant.platform.product.application.dto.ProductResponse;
 import com.absys.saas.tenant.platform.product.domain.model.*;
 import com.absys.saas.tenant.platform.product.domain.repository.ProductRepository;
+import com.absys.saas.tenant.platform.subscription.application.security.RequiresActiveSubscription;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ public class ProductCommandService {
         this.productRepository = productRepository;
     }
 
+    @RequiresActiveSubscription
     public ProductResponse create(CreateProductCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
@@ -37,6 +39,7 @@ public class ProductCommandService {
         return toResponse(saved);
     }
 
+    @RequiresActiveSubscription
     public ProductResponse update(UpdateProductCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
@@ -54,6 +57,7 @@ public class ProductCommandService {
         return toResponse(productRepository.save(product));
     }
 
+    @RequiresActiveSubscription
     public ProductResponse activate(ActivateProductCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
@@ -65,6 +69,7 @@ public class ProductCommandService {
         return toResponse(productRepository.save(product));
     }
 
+    @RequiresActiveSubscription
     public ProductResponse deactivate(DeactivateProductCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();

@@ -64,6 +64,7 @@
 			<version>3.1.0</version>
 		</dependency>
 
+
         <!-- JJWT API -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>

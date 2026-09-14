@@ -12,6 +12,7 @@ import com.absys.saas.tenant.platform.customer.domain.model.CustomerName;
 import com.absys.saas.tenant.platform.customer.domain.repository.CustomerRepository;
 import com.absys.saas.tenant.platform.identity.infrastructure.security.TenantContext;
 
+import com.absys.saas.tenant.platform.subscription.application.security.RequiresActiveSubscription;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class CustomerCommandService {
         this.customerRepository = customerRepository;
     }
 
+    @RequiresActiveSubscription
     public CustomerResponse create(CreateCustomerCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
@@ -44,6 +46,7 @@ public class CustomerCommandService {
         return toResponse(saved);
     }
 
+    @RequiresActiveSubscription
     public CustomerResponse update(UpdateCustomerCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
@@ -66,6 +69,7 @@ public class CustomerCommandService {
         return toResponse(saved);
     }
 
+    @RequiresActiveSubscription
     public CustomerResponse activate(ActivateCustomerCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
@@ -77,6 +81,7 @@ public class CustomerCommandService {
         return toResponse(customerRepository.save(customer));
     }
 
+    @RequiresActiveSubscription
     public CustomerResponse deactivate(DeactivateCustomerCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();

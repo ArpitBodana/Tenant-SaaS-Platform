@@ -61,7 +61,11 @@ public class SecurityConfiguration {
                         // Confirm / cancel
                         .requestMatchers(HttpMethod.PATCH, "/api/orders/*/confirm", "/api/orders/*/cancel").hasAnyRole("TENANT_ADMIN", "USER")
 
-                        .anyRequest().authenticated())
+                        .requestMatchers(HttpMethod.GET, "/api/subscriptions", "/api/subscriptions/**").hasAnyRole("TENANT_ADMIN", "USER")
+
+                        .requestMatchers(HttpMethod.POST, "/api/subscriptions").hasRole("TENANT_ADMIN")
+
+                        .requestMatchers(HttpMethod.PATCH, "/api/subscriptions/**").hasRole("TENANT_ADMIN").anyRequest().authenticated())
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 

@@ -6,6 +6,7 @@ import com.absys.saas.tenant.platform.order.application.dto.OrderItemResponse;
 import com.absys.saas.tenant.platform.order.application.dto.OrderResponse;
 import com.absys.saas.tenant.platform.order.domain.model.*;
 import com.absys.saas.tenant.platform.order.domain.repository.OrderRepository;
+import com.absys.saas.tenant.platform.subscription.application.security.RequiresActiveSubscription;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +22,7 @@ public class OrderCommandService {
         this.orderRepository = orderRepository;
     }
 
+    @RequiresActiveSubscription
     public OrderResponse create(CreateOrderCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
@@ -30,6 +32,7 @@ public class OrderCommandService {
         return toResponse(orderRepository.save(order));
     }
 
+    @RequiresActiveSubscription
     public OrderResponse addItem(AddOrderItemCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
@@ -43,6 +46,7 @@ public class OrderCommandService {
         return toResponse(orderRepository.save(order));
     }
 
+    @RequiresActiveSubscription
     public OrderResponse removeItem(RemoveOrderItemCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
@@ -54,6 +58,7 @@ public class OrderCommandService {
         return toResponse(orderRepository.save(order));
     }
 
+    @RequiresActiveSubscription
     public OrderResponse confirm(ConfirmOrderCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
@@ -65,6 +70,7 @@ public class OrderCommandService {
         return toResponse(orderRepository.save(order));
     }
 
+    @RequiresActiveSubscription
     public OrderResponse cancel(CancelOrderCommand command) {
 
         UUID tenantId = TenantContext.requireTenantId();
