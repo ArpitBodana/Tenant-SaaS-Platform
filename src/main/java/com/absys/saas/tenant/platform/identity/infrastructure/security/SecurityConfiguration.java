@@ -33,6 +33,8 @@ public class SecurityConfiguration {
 
                         .requestMatchers("/api/customers/**").hasAnyRole("TENANT_ADMIN", "USER")
 
+                        .requestMatchers("/api/products/**").hasAnyRole("TENANT_ADMIN", "USER")
+
                         .anyRequest().authenticated())
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
