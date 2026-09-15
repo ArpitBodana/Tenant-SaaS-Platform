@@ -57,9 +57,8 @@ public class Order {
 
         Objects.requireNonNull(item, "Order item cannot be null");
 
-        boolean productAlreadyAdded = items.stream().anyMatch(existing -> existing.productId().equals(item.productId()));
+        if (items.stream().anyMatch(existing -> existing.productId().equals(item.productId()))) {
 
-        if (productAlreadyAdded) {
             throw new IllegalStateException("Product is already added to this order");
         }
 

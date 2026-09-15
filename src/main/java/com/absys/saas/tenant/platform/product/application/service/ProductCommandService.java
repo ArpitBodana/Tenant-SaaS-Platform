@@ -5,6 +5,7 @@ import com.absys.saas.tenant.platform.product.application.command.*;
 import com.absys.saas.tenant.platform.product.application.dto.ProductResponse;
 import com.absys.saas.tenant.platform.product.domain.model.*;
 import com.absys.saas.tenant.platform.product.domain.repository.ProductRepository;
+import com.absys.saas.tenant.platform.shared.domain.exception.NotFoundException;
 import com.absys.saas.tenant.platform.subscription.application.security.RequiresActiveSubscription;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +45,7 @@ public class ProductCommandService {
 
         UUID tenantId = TenantContext.requireTenantId();
 
-        Product product = productRepository.findByIdAndTenantId(ProductId.of(command.productId()), tenantId).orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        Product product = productRepository.findByIdAndTenantId(ProductId.of(command.productId()), tenantId).orElseThrow(() -> new NotFoundException("Product not found"));
 
         ProductSku sku = new ProductSku(command.sku());
 
@@ -83,7 +84,7 @@ public class ProductCommandService {
 
     private Product findProduct(UUID productId, UUID tenantId) {
 
-        return productRepository.findByIdAndTenantId(ProductId.of(productId), tenantId).orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        return productRepository.findByIdAndTenantId(ProductId.of(productId), tenantId).orElseThrow(() -> new NotFoundException("Product not found"));
     }
 
     private ProductResponse toResponse(Product product) {

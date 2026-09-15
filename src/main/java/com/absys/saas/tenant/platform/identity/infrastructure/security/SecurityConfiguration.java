@@ -65,7 +65,13 @@ public class SecurityConfiguration {
 
                         .requestMatchers(HttpMethod.POST, "/api/subscriptions").hasRole("TENANT_ADMIN")
 
-                        .requestMatchers(HttpMethod.PATCH, "/api/subscriptions/**").hasRole("TENANT_ADMIN").anyRequest().authenticated())
+                        .requestMatchers(HttpMethod.PATCH, "/api/subscriptions/**").hasRole("TENANT_ADMIN").anyRequest().authenticated()
+
+                        .requestMatchers(HttpMethod.GET, "/api/notifications/**").hasAnyRole("TENANT_ADMIN", "USER")
+
+                        .requestMatchers(HttpMethod.POST, "/api/notifications").hasRole("TENANT_ADMIN")
+
+                        .requestMatchers(HttpMethod.PATCH, "/api/notifications/**").hasRole("TENANT_ADMIN"))
 
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
 

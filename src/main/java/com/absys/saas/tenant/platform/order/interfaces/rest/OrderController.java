@@ -38,8 +38,7 @@ public class OrderController {
 
     @PostMapping("/{orderId}/items")
     public OrderResponse addItem(@PathVariable UUID orderId, @Valid @RequestBody AddOrderItemRequest request) {
-
-        return commandService.addItem(new AddOrderItemCommand(orderId, request.productId(), request.quantity(), request.unitPrice()));
+        return commandService.addItem(new AddOrderItemCommand(orderId, request.productId(), request.quantity()));
     }
 
     @DeleteMapping("/{orderId}/items/{orderItemId}")
@@ -75,12 +74,6 @@ public class OrderController {
     public record CreateOrderRequest(@NotNull UUID customerId) {
     }
 
-    public record AddOrderItemRequest(
-
-            @NotNull UUID productId,
-
-            @Min(1) int quantity,
-
-            @NotNull @DecimalMin(value = "0.00") BigDecimal unitPrice) {
+    public record AddOrderItemRequest(@NotNull UUID productId, @Min(1) int quantity) {
     }
 }

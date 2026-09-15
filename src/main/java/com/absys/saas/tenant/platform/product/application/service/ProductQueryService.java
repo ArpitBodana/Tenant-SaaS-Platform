@@ -7,6 +7,7 @@ import com.absys.saas.tenant.platform.product.application.query.GetProductsQuery
 import com.absys.saas.tenant.platform.product.domain.model.Product;
 import com.absys.saas.tenant.platform.product.domain.model.ProductId;
 import com.absys.saas.tenant.platform.product.domain.repository.ProductRepository;
+import com.absys.saas.tenant.platform.shared.domain.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +28,7 @@ public class ProductQueryService {
 
         UUID tenantId = TenantContext.requireTenantId();
 
-        Product product = productRepository.findByIdAndTenantId(ProductId.of(query.productId()), tenantId).orElseThrow(() -> new IllegalArgumentException("Product not found"));
+        Product product = productRepository.findByIdAndTenantId(ProductId.of(query.productId()), tenantId).orElseThrow(() -> new NotFoundException("Product not found"));
 
         return toResponse(product);
     }

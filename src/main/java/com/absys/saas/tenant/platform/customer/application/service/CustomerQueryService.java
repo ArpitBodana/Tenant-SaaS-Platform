@@ -8,6 +8,7 @@ import com.absys.saas.tenant.platform.customer.domain.model.CustomerId;
 import com.absys.saas.tenant.platform.customer.domain.repository.CustomerRepository;
 import com.absys.saas.tenant.platform.identity.infrastructure.security.TenantContext;
 
+import com.absys.saas.tenant.platform.shared.domain.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +29,7 @@ public class CustomerQueryService {
 
         UUID tenantId = TenantContext.requireTenantId();
 
-        Customer customer = customerRepository.findByIdAndTenantId(CustomerId.of(query.customerId()), tenantId).orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+        Customer customer = customerRepository.findByIdAndTenantId(CustomerId.of(query.customerId()), tenantId).orElseThrow(() -> new NotFoundException("Customer not found"));
 
         return toResponse(customer);
     }

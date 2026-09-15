@@ -12,6 +12,7 @@ import com.absys.saas.tenant.platform.customer.domain.model.CustomerName;
 import com.absys.saas.tenant.platform.customer.domain.repository.CustomerRepository;
 import com.absys.saas.tenant.platform.identity.infrastructure.security.TenantContext;
 
+import com.absys.saas.tenant.platform.shared.domain.exception.NotFoundException;
 import com.absys.saas.tenant.platform.subscription.application.security.RequiresActiveSubscription;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -74,7 +75,7 @@ public class CustomerCommandService {
 
         UUID tenantId = TenantContext.requireTenantId();
 
-        Customer customer = customerRepository.findByIdAndTenantId(CustomerId.of(command.customerId()), tenantId).orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+        Customer customer = customerRepository.findByIdAndTenantId(CustomerId.of(command.customerId()), tenantId).orElseThrow(() -> new NotFoundException("Customer not found"));
 
         customer.activate();
 
@@ -86,7 +87,7 @@ public class CustomerCommandService {
 
         UUID tenantId = TenantContext.requireTenantId();
 
-        Customer customer = customerRepository.findByIdAndTenantId(CustomerId.of(command.customerId()), tenantId).orElseThrow(() -> new IllegalArgumentException("Customer not found"));
+        Customer customer = customerRepository.findByIdAndTenantId(CustomerId.of(command.customerId()), tenantId).orElseThrow(() -> new NotFoundException("Customer not found"));
 
         customer.deactivate();
 

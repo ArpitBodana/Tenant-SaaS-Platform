@@ -1,6 +1,7 @@
 package com.absys.saas.tenant.platform.subscription.application.service;
 
 import com.absys.saas.tenant.platform.identity.infrastructure.security.TenantContext;
+import com.absys.saas.tenant.platform.shared.domain.exception.NotFoundException;
 import com.absys.saas.tenant.platform.subscription.application.command.*;
 import com.absys.saas.tenant.platform.subscription.application.dto.SubscriptionResponse;
 import com.absys.saas.tenant.platform.subscription.domain.model.*;
@@ -73,7 +74,7 @@ public class SubscriptionCommandService {
 
     private Subscription findSubscription(UUID subscriptionId, UUID tenantId) {
 
-        return subscriptionRepository.findByIdAndTenantId(SubscriptionId.of(subscriptionId), tenantId).orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
+        return subscriptionRepository.findByIdAndTenantId(SubscriptionId.of(subscriptionId), tenantId).orElseThrow(() -> new NotFoundException("Subscription not found"));
     }
 
     private LocalDate calculateEndDate(LocalDate startDate, BillingCycle billingCycle) {

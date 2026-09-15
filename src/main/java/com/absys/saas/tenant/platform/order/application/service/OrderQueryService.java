@@ -5,6 +5,7 @@ import com.absys.saas.tenant.platform.order.application.dto.*;
 import com.absys.saas.tenant.platform.order.application.query.*;
 import com.absys.saas.tenant.platform.order.domain.model.*;
 import com.absys.saas.tenant.platform.order.domain.repository.OrderRepository;
+import com.absys.saas.tenant.platform.shared.domain.exception.NotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +26,7 @@ public class OrderQueryService {
 
         UUID tenantId = TenantContext.requireTenantId();
 
-        Order order = orderRepository.findByIdAndTenantId(OrderId.of(query.orderId()), tenantId).orElseThrow(() -> new IllegalArgumentException("Order not found"));
+        Order order = orderRepository.findByIdAndTenantId(OrderId.of(query.orderId()), tenantId).orElseThrow(() -> new NotFoundException("Order not found"));
 
         return toResponse(order);
     }

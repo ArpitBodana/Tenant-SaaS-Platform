@@ -1,6 +1,7 @@
 package com.absys.saas.tenant.platform.subscription.application.service;
 
 import com.absys.saas.tenant.platform.identity.infrastructure.security.TenantContext;
+import com.absys.saas.tenant.platform.shared.domain.exception.NotFoundException;
 import com.absys.saas.tenant.platform.subscription.application.dto.SubscriptionResponse;
 import com.absys.saas.tenant.platform.subscription.application.query.*;
 import com.absys.saas.tenant.platform.subscription.domain.model.Subscription;
@@ -25,7 +26,7 @@ public class SubscriptionQueryService {
 
         UUID tenantId = TenantContext.requireTenantId();
 
-        Subscription subscription = subscriptionRepository.findByIdAndTenantId(SubscriptionId.of(query.subscriptionId()), tenantId).orElseThrow(() -> new IllegalArgumentException("Subscription not found"));
+        Subscription subscription = subscriptionRepository.findByIdAndTenantId(SubscriptionId.of(query.subscriptionId()), tenantId).orElseThrow(() -> new NotFoundException("Subscription not found"));
 
         return toResponse(subscription);
     }
