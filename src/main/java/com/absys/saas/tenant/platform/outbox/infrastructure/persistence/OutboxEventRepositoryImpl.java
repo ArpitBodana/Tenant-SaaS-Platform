@@ -2,10 +2,12 @@ package com.absys.saas.tenant.platform.outbox.infrastructure.persistence;
 
 import com.absys.saas.tenant.platform.outbox.domain.model.OutboxEvent;
 import com.absys.saas.tenant.platform.outbox.domain.model.OutboxEventId;
+import com.absys.saas.tenant.platform.outbox.domain.model.OutboxEventStatus;
 import com.absys.saas.tenant.platform.outbox.domain.repository.OutboxEventRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class OutboxEventRepositoryImpl implements OutboxEventRepository {
@@ -25,26 +27,38 @@ public class OutboxEventRepositoryImpl implements OutboxEventRepository {
     }
 
     @Override
-    public OutboxEvent saveAndFlush(OutboxEvent event) {
+    public List<OutboxEventId> findPendingIds(int limit) {
 
-        OutboxEventJpaEntity saved = repository.saveAndFlush(toEntity(event));
-
-        return toDomain(saved);
+        return repository.findPendingIds(limit).stream().map(OutboxEventId::of).toList();
     }
 
     @Override
-    public List<OutboxEvent> findUnprocessed(int limit) {
+    public Optional<OutboxEvent> findPendingById(OutboxEventId eventId) {
 
-        return repository.findUnprocessed().stream().limit(limit).map(this::toDomain).toList();
+        return repository.findPendingByIdForUpdate(eventId.value()).map(this::toDomain);
+    }
+
+    @Override
+    public void update(OutboxEvent event) {
+
+        OutboxEventJpaEntity entity = repository.findById(event.id().value()).orElseThrow(() -> new IllegalStateException("Outbox event not found: " + event.id().value()));
+
+        if (event.status() == OutboxEventStatus.PROCESSED) {
+            entity.markProcessed(event.processedAt());
+        } else {
+            entity.registerFailure(event.status(), event.retryCount(), event.nextAttemptAt());
+        }
+
+        repository.save(entity);
     }
 
     private OutboxEventJpaEntity toEntity(OutboxEvent event) {
-
-        return new OutboxEventJpaEntity(event.id().value(), event.eventType(), event.aggregateType(), event.aggregateId(), event.payload(), event.createdAt(), event.processedAt(), event.retryCount());
+        return new OutboxEventJpaEntity(event.id().value(), event.eventType(), event.aggregateType(), event.aggregateId(), event.payload(), event.createdAt(), event.processedAt(), event.retryCount(), event.status(), event.nextAttemptAt());
     }
 
     private OutboxEvent toDomain(OutboxEventJpaEntity entity) {
-
-        return OutboxEvent.restore(OutboxEventId.of(entity.getId()), entity.getEventType(), entity.getAggregateType(), entity.getAggregateId(), entity.getPayload(), entity.getCreatedAt(), entity.getProcessedAt(), entity.getRetryCount());
+        return OutboxEvent.restore(OutboxEventId.of(entity.getId()), entity.getEventType(), entity.getAggregateType(), entity.getAggregateId(), entity.getPayload(), entity.getCreatedAt(), entity.getStatus(), entity.getProcessedAt(), entity.getRetryCount(), entity.getNextAttemptAt());
     }
+
+
 }

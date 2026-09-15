@@ -1,5 +1,6 @@
 package com.absys.saas.tenant.platform.outbox.infrastructure.persistence;
 
+import com.absys.saas.tenant.platform.outbox.domain.model.OutboxEventStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -39,5 +40,23 @@ public class OutboxEventJpaEntity {
 
     @Column(name = "retry_count", nullable = false)
     private int retryCount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private OutboxEventStatus status;
+
+    @Column(name = "next_attempt_at", nullable = false)
+    private Instant nextAttemptAt;
+
+    public void markProcessed(Instant processedAt) {
+        this.status = OutboxEventStatus.PROCESSED;
+        this.processedAt = processedAt;
+    }
+
+    public void registerFailure(OutboxEventStatus status, int retryCount, Instant nextAttemptAt) {
+        this.status = status;
+        this.retryCount = retryCount;
+        this.nextAttemptAt = nextAttemptAt;
+    }
 
 }

@@ -1,54 +1,38 @@
 package com.absys.saas.tenant.platform.outbox.application.service;
 
-import com.absys.saas.tenant.platform.outbox.domain.model.OutboxEvent;
 import com.absys.saas.tenant.platform.outbox.domain.repository.OutboxEventRepository;
-import com.absys.saas.tenant.platform.shared.application.event.OrderConfirmedEvent;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.context.ApplicationEventPublisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class OutboxPublisher {
 
-    private final OutboxEventRepository outboxEventRepository;
-    private final ObjectMapper objectMapper;
-    private final ApplicationEventPublisher eventPublisher;
+    private static final Logger log = LoggerFactory.getLogger(OutboxPublisher.class);
 
-    public OutboxPublisher(OutboxEventRepository outboxEventRepository, ObjectMapper objectMapper, ApplicationEventPublisher eventPublisher) {
+    private final OutboxEventRepository outboxEventRepository;
+    private final OutboxEventProcessor outboxEventProcessor;
+
+    public OutboxPublisher(OutboxEventRepository outboxEventRepository, OutboxEventProcessor outboxEventProcessor) {
+
         this.outboxEventRepository = outboxEventRepository;
-        this.objectMapper = objectMapper;
-        this.eventPublisher = eventPublisher;
+        this.outboxEventProcessor = outboxEventProcessor;
     }
 
     @Scheduled(fixedDelay = 5000)
-    @Transactional
     public void publish() {
 
-        var events = outboxEventRepository.findUnprocessed(50);
+        var eventIds = outboxEventRepository.findPendingIds(50);
 
-        for (OutboxEvent event : events) {
+        if (eventIds.isEmpty()) {
+            return;
+        }
 
-            try {
+        log.info("Outbox publisher found {} pending events", eventIds.size());
 
-                if (event.eventType().equals(OrderConfirmedEvent.class.getName())) {
-
-                    OrderConfirmedEvent orderConfirmedEvent = objectMapper.readValue(event.payload(), OrderConfirmedEvent.class);
-
-                    eventPublisher.publishEvent(orderConfirmedEvent);
-                }
-
-                event.markProcessed();
-
-                outboxEventRepository.save(event);
-
-            } catch (Exception exception) {
-
-                event.incrementRetryCount();
-
-                outboxEventRepository.save(event);
-            }
+        for (var eventId : eventIds) {
+            outboxEventProcessor.process(eventId);
         }
     }
 }
